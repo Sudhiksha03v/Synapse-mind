@@ -207,10 +207,10 @@ export default function Home() {
               className="max-w-3xl mx-auto px-4"
             >
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 md:mb-6">
-                Ready to Experience the Power of ML?
+                Destigmatize mental health issues & get a better mindspace?
               </h2>
               <p className="text-base md:text-lg text-foreground/70 mb-6 md:mb-8">
-                Join the future of mental health analysis with our advanced machine learning platform.
+                Join the future of mental health analysis with our advanced analysis and in-advance help from trained professionals.
               </p>
               <Link
                 href="/analyze"

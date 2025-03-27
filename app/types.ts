@@ -1,3 +1,4 @@
+// File: types.ts
 export interface Category {
   name: string;
   confidence: number;
@@ -7,4 +8,4 @@ export interface Category {
 export interface AnalysisResult {
   categories: Category[];
   summary: string;
-} 
+}
