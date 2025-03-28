@@ -463,7 +463,7 @@ export default function AnalyzePage(): JSX.Element {
                     <div className="relative h-72">
                       <Bar data={confidenceMatrixData} options={barOptions} />
                     </div>
-                    <p className="text-sm text-gray-400 mt-4">Confidence scores for detected mental health categories.</p>
+                    <p className="text-sm text-gray-400 mt-4">Confidence scores for the post\'s detected mental health categories.</p>
                   </motion.div>
 
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
