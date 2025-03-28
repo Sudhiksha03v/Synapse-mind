@@ -148,7 +148,7 @@ const Therapists = () => {
         {/* Header */}
         <section className="text-center mb-20">
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white bg-clip-text"
+            className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
             style={{ backgroundImage: `linear-gradient(to right, ${sageTheme.light}, ${sageTheme.dark})` }}
           >
             Our Therapists
