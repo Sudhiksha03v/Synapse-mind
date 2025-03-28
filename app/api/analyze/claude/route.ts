@@ -1,38 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
+interface AnthropicResponse {
+  content: { text: string }[];
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { text } = await request.json();
 
     if (!text || typeof text !== 'string') {
-      return NextResponse.json(
-        { error: 'Valid text content is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Valid text content is required' }, { status: 400 });
     }
 
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
-    
     if (!anthropicApiKey) {
-      return NextResponse.json(
-        { error: 'Anthropic API key is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Anthropic API key is not configured' }, { status: 500 });
     }
 
-    // Define the categories for mental health analysis
-    const categories = [
-      'Sleep Issues',
-      'Anxiety',
-      'Depression',
-      'Stress',
-      'Self-Harm',
-      'Emotional Distress',
-      'None'
-    ];
+    const categories = ['Sleep Issues', 'Anxiety', 'Depression', 'Stress', 'Self-Harm', 'Emotional Distress', 'None'];
 
-    // Create a prompt for Claude
     const prompt = `
       Analyze the following social media post for signs of mental health issues.
       Categorize it into one or more of these categories: ${categories.join(', ')}.
@@ -55,18 +42,12 @@ export async function POST(request: NextRequest) {
       }
     `;
 
-    // Call the Anthropic Claude API
-    const response = await axios.post(
+    const response = await axios.post<AnthropicResponse>(
       'https://api.anthropic.com/v1/messages',
       {
         model: 'claude-3-haiku-20240307',
         max_tokens: 1000,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
+        messages: [{ role: 'user', content: prompt }],
         system: 'You are a mental health analysis assistant that detects signs of mental health issues in social media posts. Always respond with a valid JSON object in the requested format.',
       },
       {
@@ -78,30 +59,16 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Parse the response
     const responseContent = response.data.content[0].text;
-    
-    try {
-      // Sometimes Claude might add extra text around the JSON, so extract just the JSON part
-      const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
-      const jsonString = jsonMatch ? jsonMatch[0] : responseContent;
-      
-      const analysis = JSON.parse(jsonString);
-      return NextResponse.json(analysis);
-    } catch (e) {
-      return NextResponse.json(
-        { error: 'Failed to parse analysis result', detail: responseContent },
-        { status: 500 }
-      );
-    }
-  } catch (error: any) {
+    const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+    const jsonString = jsonMatch ? jsonMatch[0] : responseContent;
+    const analysis = JSON.parse(jsonString);
+    return NextResponse.json(analysis);
+  } catch (error: unknown) {
     console.error('Error analyzing text with Claude:', error);
-    return NextResponse.json(
-      { 
-        error: 'An error occurred during analysis', 
-        detail: error.response?.data?.error?.message || error.message 
-      },
-      { status: 500 }
-    );
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorDetail =
+      error instanceof Object && 'response' in error && (error as { response?: { data?: { error?: { message?: string } } } }).response?.data?.error?.message || errorMessage;
+    return NextResponse.json({ error: 'An error occurred during analysis', detail: errorDetail }, { status: 500 });
   }
-} 
+}
