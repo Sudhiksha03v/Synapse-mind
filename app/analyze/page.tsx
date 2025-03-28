@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import PostAnalyzer from '@/app/components/PostAnalyzer';
 import MockFeed from '@/app/components/MockFeed';
 import { motion } from 'framer-motion';
@@ -207,7 +207,7 @@ export default function AnalyzePage(): JSX.Element {
         {/* Header */}
         <section className="text-center mb-20">
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white bg-clip-text"
+            className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
             style={{ backgroundImage: `linear-gradient(to right, ${sageTheme.light}, ${sageTheme.dark})` }}
           >
             Your Feed, Our Analysis
