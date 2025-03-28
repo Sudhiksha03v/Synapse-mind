@@ -10,8 +10,18 @@ const sageTheme = {
   dark: '#6B7A5F', // Sage 600
 };
 
+// Define Therapist interface
+interface Therapist {
+  name: string;
+  location: string;
+  specialty: string;
+  bio: string;
+  contact: string;
+  credentials: string;
+}
+
 // Therapist data structured by region
-const therapistsData = {
+const therapistsData: Record<string, Therapist[]> = {
   hyderabad: [
     {
       name: 'Dr. Priya Sharma, PhD',
@@ -100,7 +110,7 @@ const Therapists = () => {
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const item = { hidden: { y: 20, opacity: 0 }, show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } };
 
-  const renderTherapistCard = (therapist: any, region: string, index: number) => (
+  const renderTherapistCard = (therapist: Therapist, region: string, index: number) => (
     <motion.div
       key={`${region}-${index}`}
       variants={item}
@@ -134,7 +144,6 @@ const Therapists = () => {
 
   return (
     <main className="relative min-h-screen">
-      {/* Seamless Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-0">
         <div
           className="absolute inset-0 backdrop-blur-sm"
@@ -145,7 +154,6 @@ const Therapists = () => {
       </div>
 
       <div className="container mx-auto px-6 py-10 pt-40 md:pt-48 lg:pt-56 relative z-10">
-        {/* Header */}
         <section className="text-center mb-20">
           <h1
             className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
@@ -158,9 +166,7 @@ const Therapists = () => {
           </p>
         </section>
 
-        {/* Therapists Sections */}
         <motion.div variants={container} initial="hidden" animate="show">
-          {/* Hyderabad Therapists */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-8">
               <div className="p-2 rounded-full" style={{ backgroundColor: `${sageTheme.light}33` }}>
@@ -176,7 +182,6 @@ const Therapists = () => {
             </motion.div>
           </section>
 
-          {/* Surrounding Regions */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-8">
               <div className="p-2 rounded-full" style={{ backgroundColor: `${sageTheme.light}33` }}>
@@ -191,7 +196,6 @@ const Therapists = () => {
             </motion.div>
           </section>
 
-          {/* India-Wide Therapists */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-8">
               <div className="p-2 rounded-full" style={{ backgroundColor: `${sageTheme.light}33` }}>
@@ -206,7 +210,6 @@ const Therapists = () => {
             </motion.div>
           </section>
 
-          {/* Global Therapists */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-8">
               <div className="p-2 rounded-full" style={{ backgroundColor: `${sageTheme.light}33` }}>
@@ -221,7 +224,6 @@ const Therapists = () => {
             </motion.div>
           </section>
 
-          {/* Contact Section */}
           <section className="text-center mb-20">
             <motion.div variants={item}>
               <h3 className="text-2xl font-medium text-white mb-4">Get Started Today</h3>

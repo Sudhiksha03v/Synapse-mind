@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, JSX } from 'react';
+import React, { useState, JSX } from 'react';
 import { motion } from 'framer-motion';
 import { Line, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, LineElement, BarElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, LineElement, BarElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, TooltipItem } from 'chart.js';
 
 // Register ChartJS components
 ChartJS.register(LineElement, BarElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
@@ -59,7 +59,7 @@ export default function Journal(): JSX.Element {
   const [newMood, setNewMood] = useState<number>(5);
   const [newNotes, setNewNotes] = useState<string>('');
   const [newTriggers, setNewTriggers] = useState<string[]>([]);
-  const [treatmentProgress, setTreatmentProgress] = useState<TreatmentProgress[]>(mockTreatmentProgress);
+  const [treatmentProgress] = useState<TreatmentProgress[]>(mockTreatmentProgress);
   const [healingGoals, setHealingGoals] = useState<HealingGoal[]>(mockHealingGoals);
   const [newGoal, setNewGoal] = useState<string>('');
   const [reflection, setReflection] = useState<string>('');
@@ -68,7 +68,7 @@ export default function Journal(): JSX.Element {
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const item = { hidden: { y: 20, opacity: 0 }, show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } };
 
-  // Mood Trend Line Chart (unchanged colors)
+  // Mood Trend Line Chart
   const moodTrendData = {
     labels: moodEntries.map(entry => entry.date),
     datasets: [
@@ -90,7 +90,12 @@ export default function Journal(): JSX.Element {
     maintainAspectRatio: false,
     plugins: {
       legend: { position: 'top' as const, labels: { color: '#d1d5db' } },
-      tooltip: { enabled: true, callbacks: { label: (context: any) => `Mood: ${context.raw} - ${moodEntries[context.dataIndex].notes}` } },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: (context: TooltipItem<'line'>) => `Mood: ${context.raw} - ${moodEntries[context.dataIndex].notes}`,
+        },
+      },
     },
     scales: {
       y: { min: 1, max: 10, ticks: { color: '#d1d5db' }, grid: { color: 'rgba(209, 213, 219, 0.1)' } },
@@ -98,7 +103,7 @@ export default function Journal(): JSX.Element {
     },
   };
 
-  // Improved Triggers Bar Chart (sage green colors)
+  // Improved Triggers Bar Chart
   const allTriggers = Array.from(
     new Set(moodEntries.flatMap(entry => entry.triggers || []))
   ).map(trigger => ({
@@ -106,7 +111,7 @@ export default function Journal(): JSX.Element {
     frequency: moodEntries.filter(e => e.triggers?.includes(trigger)).length,
   })).sort((a, b) => b.frequency - a.frequency);
 
-  const topTriggers = allTriggers.slice(0, 5); // Top 5 triggers
+  const topTriggers = allTriggers.slice(0, 5);
 
   const triggerData = {
     labels: topTriggers.map(t => t.trigger),
@@ -114,11 +119,11 @@ export default function Journal(): JSX.Element {
       {
         label: 'Trigger Frequency',
         data: topTriggers.map(t => t.frequency),
-        backgroundColor: sageTheme.medium, // Sage green medium
-        borderColor: sageTheme.dark, // Sage green dark
+        backgroundColor: sageTheme.medium,
+        borderColor: sageTheme.dark,
         borderWidth: 1,
         borderRadius: 6,
-        hoverBackgroundColor: sageTheme.dark, // Darker sage green on hover
+        hoverBackgroundColor: sageTheme.dark,
       },
     ],
   };
@@ -131,9 +136,9 @@ export default function Journal(): JSX.Element {
       tooltip: {
         enabled: true,
         callbacks: {
-          label: (context: any) => {
+          label: (context: TooltipItem<'bar'>) => {
             const totalEntries = moodEntries.length;
-            const frequency = context.raw;
+            const frequency = context.raw as number;
             const percentage = ((frequency / totalEntries) * 100).toFixed(1);
             return `${context.label}: ${frequency} times (${percentage}%)`;
           },
@@ -180,7 +185,6 @@ export default function Journal(): JSX.Element {
 
   return (
     <main className="relative min-h-screen">
-      {/* Seamless Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-0">
         <div
           className="absolute inset-0 backdrop-blur-sm"
@@ -191,7 +195,6 @@ export default function Journal(): JSX.Element {
       </div>
 
       <div className="container mx-auto px-6 py-10 pt-40 md:pt-48 lg:pt-56 relative z-10">
-        {/* Header */}
         <section className="text-center mb-20">
           <h1
             className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
@@ -204,9 +207,7 @@ export default function Journal(): JSX.Element {
           </p>
         </section>
 
-        {/* Journal Sections */}
         <motion.div variants={container} initial="hidden" animate="show">
-          {/* Mood Tracker */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-10">
               <div
@@ -329,7 +330,6 @@ export default function Journal(): JSX.Element {
             </motion.div>
           </section>
 
-          {/* Treatment Progress */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-10">
               <div
@@ -368,7 +368,6 @@ export default function Journal(): JSX.Element {
             </motion.div>
           </section>
 
-          {/* Healing Goals */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-10">
               <div
@@ -421,7 +420,6 @@ export default function Journal(): JSX.Element {
             </motion.div>
           </section>
 
-          {/* Healing Strategies */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-10">
               <div
@@ -454,7 +452,6 @@ export default function Journal(): JSX.Element {
             <p className="text-gray-400 text-sm mt-6 text-center">Integrate these strategies into your routine for holistic healing.</p>
           </section>
 
-          {/* Reflection & Growth */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-10">
               <div
@@ -488,7 +485,6 @@ export default function Journal(): JSX.Element {
             </motion.div>
           </section>
 
-          {/* Quick Tips */}
           <section className="mb-20">
             <motion.div variants={item} className="flex items-center justify-center mb-10">
               <div
