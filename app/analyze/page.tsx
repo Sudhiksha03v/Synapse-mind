@@ -5,17 +5,21 @@ import PostAnalyzer from '@/app/components/PostAnalyzer';
 import MockFeed from '@/app/components/MockFeed';
 import { motion } from 'framer-motion';
 import { Bar, Doughnut, PolarArea } from 'react-chartjs-2';
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement, RadialLinearScale } from 'chart.js';
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  ArcElement,
+  RadialLinearScale,
+  ChartOptions,
+} from 'chart.js';
 
-// Register ChartJS components
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement, RadialLinearScale);
 
-// Define sage green theme colors for non-chart elements
-const sageTheme = {
-  light: '#A9BA9D', // Sage 400
-  medium: '#8A9A7E', // Sage 500
-  dark: '#6B7A5F', // Sage 600
-};
+const sageTheme = { light: '#A9BA9D', medium: '#8A9A7E', dark: '#6B7A5F' };
 
 interface AnalysisData {
   sentiment: { positive: number; negative: number; neutral: number };
@@ -29,7 +33,7 @@ interface AnalysisData {
     processingTime: number;
     modelConfidence: number;
     latencyBreakdown: { preprocessing: number; inference: number; postprocessing: number };
-    tokenEfficiency: number; // Tokens per second
+    tokenEfficiency: number;
   };
 }
 
@@ -65,7 +69,7 @@ const mockAnalysis: AnalysisData = {
     processingTime: 1.8,
     modelConfidence: 92,
     latencyBreakdown: { preprocessing: 0.3, inference: 1.2, postprocessing: 0.3 },
-    tokenEfficiency: 66.67, // 120 tokens / 1.8s
+    tokenEfficiency: 66.67,
   },
 };
 
@@ -89,13 +93,14 @@ export default function AnalyzePage(): JSX.Element {
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const item = { hidden: { y: 20, opacity: 0 }, show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } };
 
-  // Sentiment Doughnut Chart Data (unchanged colors)
   const sentimentData = {
     labels: ['Positive', 'Negative', 'Neutral'],
     datasets: [
       {
         label: 'Sentiment Distribution',
-        data: analysisData ? [analysisData.sentiment.positive, analysisData.sentiment.negative, analysisData.sentiment.neutral] : [0, 0, 0],
+        data: analysisData
+          ? [analysisData.sentiment.positive, analysisData.sentiment.negative, analysisData.sentiment.neutral]
+          : [0, 0, 0],
         backgroundColor: ['#34d399', '#f87171', '#9ca3af'],
         borderColor: ['#fff', '#fff', '#fff'],
         borderWidth: 2,
@@ -103,7 +108,7 @@ export default function AnalyzePage(): JSX.Element {
     ],
   };
 
-  const sentimentOptions = {
+  const sentimentOptions: ChartOptions<'doughnut'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -113,7 +118,6 @@ export default function AnalyzePage(): JSX.Element {
     cutout: '60%',
   };
 
-  // Keywords Bar Chart Data (unchanged colors)
   const keywordsData: BarChartData = {
     labels: analysisData?.keywords.map(kw => kw.word) || [],
     datasets: [
@@ -128,7 +132,7 @@ export default function AnalyzePage(): JSX.Element {
     ],
   };
 
-  const barOptions = {
+  const barOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { enabled: true } },
@@ -138,7 +142,6 @@ export default function AnalyzePage(): JSX.Element {
     },
   };
 
-  // Emotional Profile Polar Area Chart Data (unchanged colors)
   const emotionalProfileData = {
     labels: ['Sadness', 'Anger', 'Fear', 'Joy', 'Surprise'],
     datasets: [
@@ -151,14 +154,13 @@ export default function AnalyzePage(): JSX.Element {
     ],
   };
 
-  const polarOptions = {
+  const polarOptions: ChartOptions<'polarArea'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { position: 'bottom' as const, labels: { color: '#d1d5db' } }, tooltip: { enabled: true } },
     scales: { r: { beginAtZero: true, ticks: { color: '#d1d5db' }, grid: { color: 'rgba(209, 213, 219, 0.2)' } } },
   };
 
-  // Confidence Matrix Bar Chart Data (unchanged colors)
   const confidenceMatrixData: BarChartData = {
     labels: analysisData?.categories.map(cat => cat.name) || [],
     datasets: [
@@ -173,7 +175,6 @@ export default function AnalyzePage(): JSX.Element {
     ],
   };
 
-  // Model Performance Bar Chart Data (unchanged colors)
   const modelLabels = ['Claude', 'OpenAI', 'Deepseek', 'Gemini'];
   const modelPerformanceData: BarChartData = {
     labels: modelLabels,
@@ -193,7 +194,6 @@ export default function AnalyzePage(): JSX.Element {
 
   return (
     <main className="relative min-h-screen">
-      {/* Seamless Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-0">
         <div
           className="absolute inset-0 backdrop-blur-sm"
@@ -204,7 +204,6 @@ export default function AnalyzePage(): JSX.Element {
       </div>
 
       <div className="container mx-auto px-6 py-10 pt-40 md:pt-48 lg:pt-56 relative z-10">
-        {/* Header */}
         <section className="text-center mb-20">
           <h1
             className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
@@ -217,13 +216,12 @@ export default function AnalyzePage(): JSX.Element {
           </p>
         </section>
 
-        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
           <motion.div variants={container} initial="hidden" animate="show">
             <motion.div variants={item} className="flex items-center mb-6">
               <div
                 className="p-3 rounded-full"
-                style={{ background: `linear-gradient(to right, ${sageTheme.light}4D, ${sageTheme.dark}4D)` }}
+                style={{ background: `linear-gradient(to right, ${sageTheme.light}80, ${sageTheme.dark}80)` }}
               >
                 <svg className="w-7 h-7" style={{ color: sageTheme.light }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
@@ -240,7 +238,7 @@ export default function AnalyzePage(): JSX.Element {
             <motion.div variants={item} className="flex items-center mb-6">
               <div
                 className="p-3 rounded-full"
-                style={{ background: `linear-gradient(to right, ${sageTheme.light}4D, ${sageTheme.dark}4D)` }}
+                style={{ background: `linear-gradient(to right, ${sageTheme.light}80, ${sageTheme.dark}80)` }}
               >
                 <svg className="w-7 h-7" style={{ color: sageTheme.light }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -257,7 +255,6 @@ export default function AnalyzePage(): JSX.Element {
           </motion.div>
         </div>
 
-        {/* Detailed Insights Section */}
         {showDetailedAnalysis && analysisData && (
           <>
             <section className="mt-20">
@@ -265,7 +262,7 @@ export default function AnalyzePage(): JSX.Element {
                 <motion.div variants={item} className="flex items-center justify-center mb-10">
                   <div
                     className="p-3 rounded-full"
-                    style={{ background: `linear-gradient(to right, ${sageTheme.light}4D, ${sageTheme.dark}4D)` }}
+                    style={{ background: `linear-gradient(to right, ${sageTheme.light}80, ${sageTheme.dark}80)` }}
                   >
                     <svg className="w-7 h-7" style={{ color: sageTheme.light }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -280,7 +277,6 @@ export default function AnalyzePage(): JSX.Element {
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Sentiment Breakdown */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
                     <h3 className="text-2xl font-semibold text-white mb-4">Sentiment Breakdown</h3>
                     <div className="relative h-72">
@@ -288,7 +284,6 @@ export default function AnalyzePage(): JSX.Element {
                     </div>
                   </motion.div>
 
-                  {/* Key Phrases Detected */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
                     <h3 className="text-2xl font-semibold text-white mb-4">Key Phrases Detected</h3>
                     <div className="space-y-4 mb-6">
@@ -318,7 +313,6 @@ export default function AnalyzePage(): JSX.Element {
                     </div>
                   </motion.div>
 
-                  {/* Concern Severity */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
                     <h3 className="text-2xl font-semibold text-white mb-4">Concern Severity</h3>
                     <div className="flex items-center gap-6">
@@ -355,7 +349,6 @@ export default function AnalyzePage(): JSX.Element {
                     </div>
                   </motion.div>
 
-                  {/* Emotional Intensity */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
                     <h3 className="text-2xl font-semibold text-white mb-4">Emotional Intensity</h3>
                     <div className="flex items-center gap-6">
@@ -392,7 +385,6 @@ export default function AnalyzePage(): JSX.Element {
                     </div>
                   </motion.div>
 
-                  {/* Emotional Profile */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg col-span-1 md:col-span-2">
                     <h3 className="text-2xl font-semibold text-white mb-4">Emotional Profile</h3>
                     <div className="relative h-96">
@@ -403,13 +395,12 @@ export default function AnalyzePage(): JSX.Element {
               </motion.div>
             </section>
 
-            {/* Model Insights Section */}
             <section className="mt-20">
               <motion.div variants={container} initial="hidden" animate="show">
                 <motion.div variants={item} className="flex items-center justify-center mb-10">
                   <div
                     className="p-3 rounded-full"
-                    style={{ background: `linear-gradient(to right, ${sageTheme.light}4D, ${sageTheme.dark}4D)` }}
+                    style={{ background: `linear-gradient(to right, ${sageTheme.light}80, ${sageTheme.dark}80)` }}
                   >
                     <svg className="w-7 h-7" style={{ color: sageTheme.light }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -424,7 +415,6 @@ export default function AnalyzePage(): JSX.Element {
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Model Metrics */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg col-span-1 md:col-span-2">
                     <h3 className="text-2xl font-semibold text-white mb-6">Model Metrics</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -465,10 +455,9 @@ export default function AnalyzePage(): JSX.Element {
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-400 mt-6">Metrics reflect the model's efficiency and accuracy in analyzing the post.</p>
+                    <p className="text-sm text-gray-400 mt-6">Metrics reflect the model\'s efficiency and accuracy in analyzing the post.</p>
                   </motion.div>
 
-                  {/* Confidence Matrix */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
                     <h3 className="text-2xl font-semibold text-white mb-4">Confidence Matrix</h3>
                     <div className="relative h-72">
@@ -477,7 +466,6 @@ export default function AnalyzePage(): JSX.Element {
                     <p className="text-sm text-gray-400 mt-4">Confidence scores for detected mental health categories.</p>
                   </motion.div>
 
-                  {/* Model Performance */}
                   <motion.div variants={item} className="bg-gray-800/80 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
                     <h3 className="text-2xl font-semibold text-white mb-4">Model Performance</h3>
                     <div className="relative h-64">
