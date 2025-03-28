@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { Bar, Doughnut, PolarArea, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement, RadialLinearScale, LineElement, PointElement } from 'chart.js';
@@ -145,7 +145,7 @@ export default function Insights(): JSX.Element {
         {/* Mental Health Insights Hub */}
         <section className="text-center mb-20">
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white bg-clip-text"
+            className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
             style={{ backgroundImage: `linear-gradient(to right, ${sageTheme.light}, ${sageTheme.dark})` }}
           >
             Reports & Insights
