@@ -53,7 +53,7 @@ export default function HelpPage() {
         <motion.section variants={container} initial="hidden" animate="show" className="text-center mb-20">
           <motion.h1
             variants={item}
-            className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white bg-clip-text"
+            className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white bg-clip-text"
             style={{ backgroundImage: `linear-gradient(to right, ${sageTheme.light}, ${sageTheme.dark})` }}
           >
             Help & Support
