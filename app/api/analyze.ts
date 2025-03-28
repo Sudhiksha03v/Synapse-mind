@@ -5,6 +5,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+interface OpenAIResponse {
+  choices: { message: { content: string } }[];
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { text } = await req.json();
@@ -23,12 +27,13 @@ export async function POST(req: NextRequest) {
         { role: 'user', content: text },
       ],
       response_format: { type: 'json_object' },
-    });
+    }) as OpenAIResponse;
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('OpenAI API error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to analyze post' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Failed to analyze post';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
