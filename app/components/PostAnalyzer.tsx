@@ -83,19 +83,6 @@ export default function PostAnalyzer({ initialText = '', onAnalyze }: PostAnalyz
     }
   };
 
-  const getCategoryColor = (category: string): { gradientFrom: string; gradientTo: string; text: string } => {
-    const categoryColors: Record<string, { gradientFrom: string; gradientTo: string; text: string }> = {
-      Anxiety: { gradientFrom: 'from-yellow-400', gradientTo: 'to-orange-500', text: 'text-yellow-800 dark:text-yellow-300' },
-      Depression: { gradientFrom: 'from-blue-500', gradientTo: 'to-purple-600', text: 'text-blue-800 dark:text-blue-300' },
-      Stress: { gradientFrom: 'from-orange-400', gradientTo: 'to-red-500', text: 'text-orange-800 dark:text-orange-300' },
-      'Self-Harm': { gradientFrom: 'from-red-400', gradientTo: 'to-pink-600', text: 'text-red-800 dark:text-red-300' },
-      'Sleep Issues': { gradientFrom: 'from-indigo-400', gradientTo: 'to-blue-500', text: 'text-indigo-800 dark:text-indigo-300' },
-      'Emotional Distress': { gradientFrom: 'from-pink-400', gradientTo: 'to-purple-600', text: 'text-pink-800 dark:text-pink-300' },
-      None: { gradientFrom: 'from-green-400', gradientTo: 'to-teal-500', text: 'text-green-800 dark:text-green-300' },
-    };
-    return categoryColors[category] || { gradientFrom: 'from-gray-400', gradientTo: 'to-gray-600', text: 'text-gray-800 dark:text-gray-300' };
-  };
-
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const item = { hidden: { y: 20, opacity: 0 }, show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } };
 
@@ -244,24 +231,21 @@ export default function PostAnalyzer({ initialText = '', onAnalyze }: PostAnalyz
             Analysis Results
           </h3>
           <div className="space-y-6">
-            {analysis.categories.map((category, index) => {
-              const { gradientFrom, gradientTo, text } = getCategoryColor(category.name);
-              return (
-                <motion.div
-                  key={index}
-                  className={`p-5 rounded-lg bg-gradient-to-r ${gradientFrom} ${gradientTo} shadow-md`}
-                  variants={item}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className={`text-lg font-semibold ${text}`}>{category.name}</h4>
-                    <span className={`text-sm font-medium ${text} bg-white/20 px-2 py-1 rounded-full`}>
-                      {category.confidence}%
-                    </span>
-                  </div>
-                  <p className={`text-sm ${text} leading-relaxed`}>{category.explanation}</p>
-                </motion.div>
-              );
-            })}
+            {analysis.categories.map((category, index) => (
+              <motion.div
+                key={index}
+                className="p-5 rounded-lg bg-gray-700/30 shadow-md"
+                variants={item}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-lg font-semibold text-white">{category.name}</h4>
+                  <span className="text-sm font-medium text-gray-300 bg-white/20 px-2 py-1 rounded-full">
+                    {category.confidence}%
+                  </span>
+                </div>
+                <p className="text-sm text-gray-300 leading-relaxed">{category.explanation}</p>
+              </motion.div>
+            ))}
             <motion.div className="p-5 bg-gray-700/30 rounded-lg shadow-inner" variants={item}>
               <h4 className="text-lg font-semibold text-white mb-2">Summary</h4>
               <p className="text-sm text-gray-300 leading-relaxed">{analysis.summary}</p>
