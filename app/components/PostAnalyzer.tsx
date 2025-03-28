@@ -74,8 +74,9 @@ export default function PostAnalyzer({ initialText = '', onAnalyze }: PostAnalyz
       if (onAnalyze) {
         onAnalyze();
       }
-    } catch (err: any) {
-      setError(`Error analyzing post: ${err.message}`);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Error analyzing post: ${errorMessage}`);
       console.error('Analysis failed:', err);
     } finally {
       setIsLoading(false);
@@ -116,7 +117,7 @@ export default function PostAnalyzer({ initialText = '', onAnalyze }: PostAnalyz
                   whileTap={{ scale: 0.97 }}
                 >
                   <input
-                    type="radio" // Changed to radio for single selection
+                    type="radio"
                     name="model"
                     checked={model === m}
                     onChange={() => setModel(m)}
@@ -221,92 +222,51 @@ export default function PostAnalyzer({ initialText = '', onAnalyze }: PostAnalyz
           animate="show"
         >
           <div className="absolute inset-0 rounded-xl opacity-15 bg-gradient-to-br from-primary to-accent pointer-events-none" />
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="relative w-16 h-16">
-              <div className="absolute inset-0 border-4 border-primary/20 rounded-full animate-spin" />
-              <div className="absolute inset-2 border-4 border-transparent border-t-accent rounded-full animate-spin" style={{ animationDirection: 'reverse' }} />
-            </div>
-            <p className="text-foreground/80 font-semibold text-base">
-              Analyzing with {model === 'openai' ? 'OpenAI GPT-4o' : model === 'claude' ? 'Anthropic Claude' : model === 'deepseek-r1' ? 'Deepseek R1' : 'Gemini Flash 2.5'}
-            </p>
-            <p className="text-sm text-foreground/60">Processing sentiment and mental health indicators...</p>
+          <div className="flex items-center justify-center">
+            <svg className="animate-spin h-8 w-8 mr-3 text-primary" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-foreground text-lg">Processing your post...</span>
           </div>
         </motion.div>
       )}
 
-      {analysis && !isLoading && (
+      {analysis && (
         <motion.div
-          className="relative rounded-xl bg-card/85 p-6 shadow-lg border-2 border-gradient-to-r from-primary/50 to-accent/50"
+          className="relative p-6 bg-card/85 rounded-xl shadow-lg border-2 border-gradient-to-r from-primary/50 to-accent/50"
           variants={container}
           initial="hidden"
           animate="show"
         >
-          <div className="absolute inset-0 rounded-xl opacity-15 bg-gradient-to-br from-primary to-accent pointer-events-none" />
-          <h3 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Analysis Results</h3>
-          <p className="text-sm text-foreground/70 mb-6 flex items-center">
-            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v2h2v-2zm0-8H9v6h2V5z" />
-            </svg>
-            Analyzed with {model === 'openai' ? 'OpenAI GPT-4o' : model === 'claude' ? 'Anthropic Claude' : model === 'deepseek-r1' ? 'Deepseek R1' : 'Gemini Flash 2.5'}
-          </p>
-          <motion.div className="space-y-8" variants={container}>
-            <motion.div variants={item}>
-              <h4 className="text-base font-semibold mb-3 flex items-center text-foreground/80 bg-background/10 p-2 rounded-md">
-                <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 102 0V6a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                Summary Assessment
-              </h4>
-              <p className="text-foreground/90 leading-relaxed">{analysis.summary}</p>
-            </motion.div>
-            <motion.div variants={item}>
-              <h4 className="flex items-center text-base font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent bg-background/10 p-2 rounded-md">
-                <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 102 0v-4zM9 9a1 1 0 000 2v3a1 1 0 102 0V6a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                Detected Categories
-              </h4>
-              {analysis.categories.length > 0 ? (
-                <div className="space-y-5">
-                  {analysis.categories.map((category, index) => {
-                    const style = getCategoryColor(category.name);
-                    return (
-                      <motion.div key={index} className="relative rounded-xl bg-card/95 shadow-md" variants={item}>
-                        <div className={`absolute inset-0 rounded-xl opacity-25 bg-gradient-to-br ${style.gradientFrom} ${style.gradientTo} pointer-events-none`} />
-                        <div className="p-4">
-                          <div className="flex justify-between items-center mb-2">
-                            <h5 className={`font-semibold ${style.text} flex items-center`}>
-                              <span className="w-2 h-2 rounded-full bg-current mr-2"></span>
-                              {category.name}
-                            </h5>
-                            <span className={`text-sm ${style.text}`}>{category.confidence}% Confidence</span>
-                          </div>
-                          <div className="w-full bg-gray-200/20 rounded-full h-2 mb-3">
-                            <div
-                              className={`h-2 rounded-full bg-gradient-to-r ${style.gradientFrom} ${style.gradientTo}`}
-                              style={{ width: `${category.confidence}%` }}
-                            />
-                          </div>
-                          <p className="text-sm text-foreground/80">{category.explanation}</p>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <motion.div className="relative p-5 rounded-xl bg-card/95 shadow-md flex items-center" variants={item}>
-                  <div className="absolute inset-0 rounded-xl opacity-25 bg-gradient-to-br from-green-400 to-teal-500 pointer-events-none" />
-                  <svg className="w-10 h-10 mr-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-foreground/90">No Mental Health Concerns Detected</p>
-                    <p className="text-sm text-foreground/70 mt-1">{analysis.summary}</p>
+          <div className="absolute inset-0 rounded-xl opacity-10 bg-gradient-to-br from-primary to-accent pointer-events-none" />
+          <h3 className="text-2xl font-bold mb-6 text-white bg-clip-text bg-gradient-to-r from-primary to-accent">
+            Analysis Results
+          </h3>
+          <div className="space-y-6">
+            {analysis.categories.map((category, index) => {
+              const { gradientFrom, gradientTo, text } = getCategoryColor(category.name);
+              return (
+                <motion.div
+                  key={index}
+                  className={`p-5 rounded-lg bg-gradient-to-r ${gradientFrom} ${gradientTo} shadow-md`}
+                  variants={item}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className={`text-lg font-semibold ${text}`}>{category.name}</h4>
+                    <span className={`text-sm font-medium ${text} bg-white/20 px-2 py-1 rounded-full`}>
+                      {category.confidence}%
+                    </span>
                   </div>
+                  <p className={`text-sm ${text} leading-relaxed`}>{category.explanation}</p>
                 </motion.div>
-              )}
+              );
+            })}
+            <motion.div className="p-5 bg-gray-700/30 rounded-lg shadow-inner" variants={item}>
+              <h4 className="text-lg font-semibold text-white mb-2">Summary</h4>
+              <p className="text-sm text-gray-300 leading-relaxed">{analysis.summary}</p>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </div>
