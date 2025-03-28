@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
@@ -114,7 +114,7 @@ export default function ResearchPage(): JSX.Element {
         {/* Header */}
         <section className="text-center mb-20">
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white bg-clip-text"
+            className="text-4xl md:text-5xl lg:text-5xl font-semibold text-white bg-clip-text"
             style={{ backgroundImage: `linear-gradient(to right, ${sageTheme.light}, ${sageTheme.dark})` }}
           >
             Research & Statistics
@@ -185,8 +185,7 @@ export default function ResearchPage(): JSX.Element {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600/50 focus:outline-none focus:ring-2"
-                  style={{ focusRingColor: sageTheme.light }}
+                  className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-sage-400"
                   placeholder="Search papers by title, author, or publisher..."
                 />
               </div>
